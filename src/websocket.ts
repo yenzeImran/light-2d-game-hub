@@ -5,9 +5,14 @@ let socket: WebSocket | null = null;
 let reconnectTimer: number;
 
 export function connectWebSocket() {
-  const protocol = window.location.protocol === 'https:' ? 'wss' : 'ws';
-  const host = window.location.hostname === 'localhost' ? 'localhost:3001' : window.location.host;
-  const url = `${protocol}://${host}/ws`;
+  const envUrl = import.meta.env.VITE_WS_SERVER_URL;
+  const defaultProtocol = window.location.protocol === 'https:' ? 'wss' : 'ws';
+  const defaultHost = window.location.hostname === 'localhost' ? 'localhost:3001' : window.location.host;
+  const url = envUrl
+    ? envUrl.startsWith('ws://') || envUrl.startsWith('wss://')
+      ? envUrl
+      : `${defaultProtocol}://${envUrl}`
+    : `${defaultProtocol}://${defaultHost}/ws`;
 
   socket = new WebSocket(url);
 
